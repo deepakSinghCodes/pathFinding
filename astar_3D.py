@@ -7,22 +7,32 @@
 #The algorithm can work for bigger grid if we remove an initial grid, but then we will
 #not have a return path list. Or we can put the grid on a text file. and read it. 
 
-#import pandas as pd
 import math
 import numpy as np
 import datetime
 from builtins import isinstance
 
+#Entered number is not a positive integer or whole number
 class Err1_posnum(Exception):
     pass
+
+#Start point is not inside the grid.
 class Err2_originout(Exception):
     pass
+
+#End point is not inside the grid.
 class Err3_endout(Exception):
     pass
+
+#Zero grid size
 class Err4_zerogrid(Exception):
     pass
+
+#Prevent code from running into infinite loop
 class Err5_infiloop(Exception):
     pass
+
+#Printing ending time as an exception
 class Err6_finish(Exception):
     pass
 
@@ -128,11 +138,13 @@ def make_neighbour_gridpoint(grid,x,y,z,i_start,j_start,k_start,i_stop,j_stop,k_
                             grid[l][m][n].displace = euclidean(grid[l][m][n], grid[i_start][j_start][k_start])
                     else:
                         grid[l][m][n] = gridpoint(round(((len(grid)**2)+(len(grid[0])**2)+(len(grid[0][0])**2)),3),l,m,n)
-   
+
+#Function to get euclidean distance - L-2 norm   
 def euclidean(a,b):
     displace = round(math.sqrt((a.indices[0]-b.indices[0])**2 +(a.indices[1]-b.indices[1])**2+(a.indices[2]-b.indices[2])**2),3)
     return displace
 
+#Function to get manhattan distance - adding all dimension    
 def manhattan(a,b):
     displace = (abs(a.indices[0]-b.indices[0])+abs(a.indices[1]-b.indices[1])+abs(a.indices[2]-b.indices[2]))
     return displace
@@ -155,11 +167,9 @@ def xneighbours(grid,checklist,origin,end,disptype):
     #path. So check if with the new g value the f value is reduced. If yes, update
     #Check if the point to be checked is within the grid or not
     #check if the neighbours are in grid checklist or not
-    
     if (i > 0) and (((origin.g + 1) + grid[i-1][j][k].h) < grid[i-1][j][k].f):
         grid[i-1][j][k].g = grid[i][j][k].g + 1
         change_gridvalue(grid,checklist,i-1,j,k,origin,end,disptype)
-        print(grid[i-1][j][k].f)        
     if (i<len(grid)-1) and (((origin.g + 1) + grid[i+1][j][k].h) < grid[i+1][j][k].f):
         grid[i+1][j][k].g = grid[i][j][k].g + 1
         change_gridvalue(grid,checklist,i+1,j,k,origin,end,disptype)
@@ -170,7 +180,6 @@ def yneighbours(grid,checklist,origin,end,disptype):
     #path. So check if with the new g value the f value is reduced. If yes, update
     #Check that the point to be checked is within the grid
     #check if the neighbours are in grid checklist or not
-    #print("Original gy value: ", grid[i][j+1][k].h)
     if (j > 0) and (((origin.g + 1) + grid[i][j-1][k].h) < grid[i][j-1][k].f):
         grid[i][j-1][k].g = origin.g + 1
         change_gridvalue(grid,checklist,i,j-1,k,origin,end,disptype)
@@ -340,14 +349,10 @@ def clean_checklist(checklist):
         if ch in checklist:
             checklist.remove(ch)       
         
-    
-    
 def prog_run(x,y,z,i_start,j_start,k_start,i_stop,j_stop,k_stop):
     try:
         print(str(datetime.datetime.now()))
         grid = makegrid(x,y,z,i_start,j_start,k_start,i_stop,j_stop,k_stop)
-        #print("x,y,z,i_start,j_start,k_start,i_stop,j_stop,k_stop")
-        #print(x,y,z,i_start,j_start,k_start,i_stop,j_stop,k_stop)
         make_neighbour_gridpoint(grid,i_start,j_start,k_start,i_start,j_start,k_start,i_stop,j_stop,k_stop)
         make_neighbour_gridpoint(grid,i_stop,j_stop,k_stop,i_start,j_start,k_start,i_stop,j_stop,k_stop)
         checklist = []
@@ -372,7 +377,7 @@ def prog_run(x,y,z,i_start,j_start,k_start,i_stop,j_stop,k_stop):
             for ch in checklist:
                 if (end.indices == ch.indices):
                     ans = ch
-                    #print("The answer indices are: ", ans.indices)
+                    print("The answer for a {}X{}X{} grid.".format(x,y,z))
                     print("The minimum distance is: ", ans.f)
                     print("The last step location is: ", ans.origin)
                     print("The number of steps taken is: ", q)
@@ -399,16 +404,8 @@ def prog_run(x,y,z,i_start,j_start,k_start,i_stop,j_stop,k_stop):
         print(str(datetime.datetime.now()))  
 
 def mainrun():
-#  input format  prog_run(x,y,z,i_start,j_start,k_start,i_stop,j_stop,k_stop)
-#  print("The answer for a 50X50X50 grid.")
-#  prog_run(50,50,50,0,0,0,49,49,49)
-#   print("The answer for a 100X100X100 grid.")
-#   prog_run(100,100,100,0,0,0,99,99,99)
-#  print("The answer for a 300X300X300 grid.")
-#  prog_run(300,300,300,0,0,0,299,299,299)
-#  print("The answer for a 500X500X500 grid.")
-#  prog_run(500,500,500,0,0,0,499,499,499)
-   print("The answer for a 800X800X800 grid.")
-   prog_run(800,800,800,0,0,0,799,799,799)
+  x,y,z,i_start,j_start,k_start,i_stop,j_stop,k_stop = getinput()
+  prog_run(x,y,z,i_start,j_start,k_start,i_stop,j_stop,k_stop)
+
 
 mainrun() 
